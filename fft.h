@@ -22,12 +22,6 @@ namespace FFTLibrary {
         Eigen::MatrixXcd fft(const Eigen::MatrixXcd& X, int n = -1, int dim = -1) const override;
     };
 
-    // FFT 按行计算
-    class FFTRow : public FFTBase {
-    public:
-        Eigen::MatrixXcd fft(const Eigen::MatrixXcd& X, int n = -1, int dim = -1) const override;
-    };
-
     // FFT 指定维度计算
     class FFTN : public FFTBase {
     public:
