@@ -10,7 +10,6 @@ namespace FFTLibrary {
         Eigen::MatrixXcd Y;
 
         if (dim == 1) {
-            // Process columns
             Y.resize(n, X.cols());
             for (int i = 0; i < X.cols(); ++i) {
                 Eigen::VectorXcd x_col = X.col(i);
@@ -28,7 +27,6 @@ namespace FFTLibrary {
                 Y.col(i) = y_col;
             }
         } else if (dim == 2) {
-            // Process rows
             Y.resize(X.rows(), n);
             for (int i = 0; i < X.rows(); ++i) {
                 Eigen::VectorXcd x_row = X.row(i);
