@@ -16,12 +16,6 @@ namespace FFTLibrary {
         virtual Eigen::MatrixXcd fft(const Eigen::MatrixXcd& X, int n = -1, int dim = -1) const = 0;
     };
 
-    // FFT 按列计算
-    class FFTColumn : public FFTBase {
-    public:
-        Eigen::MatrixXcd fft(const Eigen::MatrixXcd& X, int n = -1, int dim = -1) const override;
-    };
-
     // FFT 指定维度计算
     class FFTN : public FFTBase {
     public:
