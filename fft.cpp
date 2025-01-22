@@ -7,59 +7,52 @@ namespace FFTLibrary {
 
     Eigen::MatrixXcd FFTN::fft(const Eigen::MatrixXcd& X, int n, int dim) const {
         Eigen::FFT<double> fft;
-        Eigen::MatrixXcd Y(X.rows(), X.cols());
+        Eigen::MatrixXcd Y;
 
         if (dim == 1) {
-            // 对每列进行 n 点 FFT 计算
+            // Process columns
+            Y.resize(n, X.cols());
             for (int i = 0; i < X.cols(); ++i) {
-                // 获取列并转换为复数类型
-                Eigen::VectorXd x_col_real = X.col(i).real();
+                Eigen::VectorXcd x_col = X.col(i);
+                Eigen::VectorXcd y_col;
 
-                // 如果输入列的长度小于 n，进行补零
-                if (x_col_real.size() < n) {
-                    Eigen::VectorXd padded_col(n);
-                    padded_col.head(x_col_real.size()) = x_col_real; // 保留原始数据，剩余部分补零
-                    x_col_real = padded_col;
+                if (x_col.size() != n) {
+                    Eigen::VectorXcd padded_col = Eigen::VectorXcd::Zero(n);
+                    padded_col.head(std::min<int>(x_col.size(), n)) = x_col.head(std::min<int>(x_col.size(), n));
+                    y_col = Eigen::VectorXcd(n);
+                    fft.fwd(y_col, padded_col);
+                } else {
+                    y_col = Eigen::VectorXcd(n);
+                    fft.fwd(y_col, x_col);
                 }
-                    // 如果输入列的长度大于 n，进行截断
-                else if (x_col_real.size() > n) {
-                    x_col_real.conservativeResize(n); // 截断为 n 长度
-                }
-                Eigen::VectorXcd x_col = x_col_real.cast<std::complex<double>>();
-                Eigen::VectorXcd y_col(n); // 创建复数输出向量
-                fft.fwd(y_col, x_col); // 执行 FFT 计算
-                Y.col(i) = y_col; // 将计算结果存入结果矩阵
+                Y.col(i) = y_col;
             }
         } else if (dim == 2) {
-            // 对每行进行 n 点 FFT 计算
+            // Process rows
+            Y.resize(X.rows(), n);
             for (int i = 0; i < X.rows(); ++i) {
-                // 获取行并转换为复数类型
-                Eigen::VectorXd x_row_real = X.row(i).real();
+                Eigen::VectorXcd x_row = X.row(i);
+                Eigen::VectorXcd y_row;
 
-                // 如果输入行的长度小于 n，进行补零
-                if (x_row_real.size() < n) {
-                    Eigen::VectorXd padded_row(n);
-                    padded_row.head(x_row_real.size()) = x_row_real; // 保留原始数据，剩余部分补零
-                    x_row_real = padded_row;
+                if (x_row.size() != n) {
+                    Eigen::VectorXcd padded_row = Eigen::VectorXcd::Zero(n);
+                    padded_row.head(std::min<int>(x_row.size(), n)) = x_row.head(std::min<int>(x_row.size(), n));
+                    y_row = Eigen::VectorXcd(n);
+                    fft.fwd(y_row, padded_row);
+                } else {
+                    y_row = Eigen::VectorXcd(n);
+                    fft.fwd(y_row, x_row);
                 }
-                    // 如果输入行的长度大于 n，进行截断
-                else if (x_row_real.size() > n) {
-                    x_row_real.conservativeResize(n); // 截断为 n 长度
-                }
-                Eigen::VectorXcd x_row = x_row_real.cast<std::complex<double>>();
-                Eigen::VectorXcd y_row(n); // 创建复数输出向量
-                fft.fwd(y_row, x_row); // 执行 FFT 计算
-                Y.row(i) = y_row.transpose(); // 将计算结果存入结果矩阵并转置回行向量
+                Y.row(i) = y_row.transpose();
             }
         }
-
-        return Y; // 返回按指定维度计算后的 FFT 结果矩阵
+        return Y;Y; // 返回按指定维度计算后的 FFT 结果矩阵
     }
 
     // 公共接口：按列计算
     Eigen::MatrixXcd fft(const Eigen::MatrixXcd& X) {
         FFTN fftN;
-        return fftN.fft(X, X.cols(), 1);
+        return fftN.fft(X, X.rows(), 1);
     }
 
     // 公共接口：按列计算，n 点 FFT
